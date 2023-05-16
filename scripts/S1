@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ip link set dev eth0 up
+
+dhclient eth0 &
+
+service apache2 start
+chmod 711 /var/www/html
+chmod 644 /var/www/html/index.html 
+

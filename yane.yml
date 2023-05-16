@@ -1,0 +1,78 @@
+network:
+  name: rendu
+  version: 0.1
+  hosts:
+    - B
+      mode : netns
+      init : ./scripts/B
+ 
+    - BOX2
+      mode : docker
+      image : dhcp_n7:latest
+      files : ./files/BOX2/etc:/
+ 
+    - A
+      mode : netns
+      init : ./scripts/A
+ 
+    - S1
+      mode : docker
+      image : apache_n7:latest
+      files : ./files/S1/var:/
+ 
+ 
+    - BOX1
+      mode : docker
+      image : dhcp_n7:latest
+      files : ./files/BOX1/etc:/
+ 
+    - RFAIA
+      mode : docker
+      image : quagga_n7:latest
+      files : ./files/RFAIA/etc:/
+ 
+ 
+    - R1
+      mode : docker
+      image : quagga_n7:latest
+      files : ./files/R1/etc:/
+ 
+    - R2
+      mode : docker
+      image : quagga_n7:latest
+      files : ./files/R2/etc:/
+ 
+ 
+    - RFAIS
+      mode : docker
+      image : quagga_n7:latest
+      files : ./files/RFAIS/etc:/
+ 
+ 
+    - WEB
+      mode : docker
+      image : apache_n7:latest
+      files : ./files/WEB/var:/
+ 
+    - DNS
+      mode : docker
+      image : dns_n7:latest
+      files : ./files/DNS/etc:/
+ 
+  links :
+    - BOX1:eth1!RFAIA:eth0
+    - BOX2:eth1!RFAIA:eth1
+    - B:eth0!BOX2:eth0
+ 
+  bridges:
+    - Switch0
+      interfaces: S1:eth0!A:eth0!BOX1:eth0!
+    - Switch1
+      interfaces: RFAIA:eth2!R2:eth0!R1:eth0!
+    - Switch2
+      interfaces: RFAIS:eth0!R1:eth1!R2:eth1!
+    - Switch3
+      interfaces: DNS:eth0!WEB:eth0!RFAIS:eth1!
+ 
+  consoles :
+    - all
